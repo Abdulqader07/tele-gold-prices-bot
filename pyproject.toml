@@ -1,0 +1,13 @@
+[project]
+name = "tele-bot-gold-prices"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "aiogram>=3.27.0",
+    "apscheduler>=3.11.2",
+    "beautifulsoup4",
+    "dotenv>=0.9.9",
+    "requests>=2.33.1",
+]
