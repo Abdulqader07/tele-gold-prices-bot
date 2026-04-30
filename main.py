@@ -1,7 +1,24 @@
+from flask import Flask
+import threading
 import asyncio
 from Bot import Bot
 
+# Flask app for Render health checks
+app = Flask(__name__)
+
+@app.route('/')
+@app.route('/health')
+def health():
+    return "Bot running", 200
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8080)
+
 async def main():
+
+    # Start Flask in background
+    threading.Thread(target=run_flask, daemon=True).start()
+    
     bot = Bot()
 
     print('To stop the bot press Ctrl + C')
