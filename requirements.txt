@@ -1,0 +1,7 @@
+aiocron
+aiogram
+apscheduler
+beautifulsoup4
+dotenv
+requests
+tzlocal
