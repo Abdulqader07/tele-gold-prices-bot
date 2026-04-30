@@ -41,14 +41,14 @@ class Bot:
             json.dump(data, wf)
 
 
-    async def calculate(self, thershold = 0.3) -> None:
+    async def calculate(self, thershold = 0.1) -> None:
         await self.price.setPrice()
         
         previous = self.loadPrice()
         current = self.price.getPrice()
 
         if current:
-            print('Gold price: $' + current, end='')
+            print('Gold price: $' + current, end='', flush=True)
         
         if previous is not None and current:
             try:
