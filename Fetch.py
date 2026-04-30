@@ -6,7 +6,7 @@ class Price:
         self.price = '' 
 
     async def setPrice(self) -> None:
-        self.price = await self.fetchPrice()
+        self.price = await self.fetchPriceAPI()
 
     def getPrice(self) -> str:
         return self.price
@@ -32,3 +32,19 @@ class Price:
             
             except Exception as e:
                 return f"Something happened while fetching price: {e}"
+            
+    async def fetchPriceAPI(self) -> str:
+        url = 'https://api.gold-api.com/price/XAU'
+
+        async with aiohttp.ClientSession() as session:
+            
+            try:
+                async with session.get(url) as response:
+                    data = await response.json()
+
+                    return f"{data['price']:.2f}"
+            
+            except Exception as e:
+                print(f'Error {e}')
+
+                return None
