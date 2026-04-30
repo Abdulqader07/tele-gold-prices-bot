@@ -8,8 +8,8 @@ class Config:
         load_dotenv()
 
         self.BOT_TOKEN = os.getenv('BOT_TOKEN')
-        self.prices_file = 'jsons/prices.json'
-        self.chats_file = 'jsons/chats.json'
+        self.prices_file = '/tmp/prices.json'
+        self.chats_file = '/tmp/chats.json'
         self.dir = 'jsons'
 
         if not self.BOT_TOKEN:
@@ -30,11 +30,38 @@ class Config:
 
         if not os.path.exists(self.chats_file):
             with open(self.chats_file, 'w') as cf:
-                json.dump({"chats_id": [1137265195, 975761240, 766851631]}, cf)
+                json.dump({"chats_id": []}, cf)
 
+    def addChat(self, chat_id):
+        chats = self.getChats()
+
+        if chat_id not in chats:
+            chats.append(chat_id)
+            with open(self.chats_file, 'w') as cf:
+                json.dump({'chats_id': chats}, cf)
+            
+            return True
+
+        return False
     
-    def getChats(self) -> list:
-        with open(self.chats_file, 'r') as cf:
-            chats = json.load(cf)
+    def removeChat(self, chat_id):
+        chats = self.getChats()
+        
+        if chat_id in chats:
+            chats.remove(chat_id)
+            with open(self.chats_file, 'w') as cf:
+                json.dump({"chats_id": chats}, cf)
 
-            return chats.get('chats_id', [])
+            return True
+        
+        return False
+
+
+    def getChats(self) -> list:
+        if os.path.exists(self.chats_file):
+            with open(self.chats_file, 'r') as cf:
+                chats = json.load(cf)
+
+                return chats.get('chats_id', [])
+        
+        return []

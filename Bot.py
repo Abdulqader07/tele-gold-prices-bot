@@ -75,7 +75,7 @@ class Bot:
         chatsList = self.conf.getChats()
         
         if not chat_ids:
-            return
+            return 'No subs yet'
         
         async with aiohttp.ClientSession() as session:
             for id in chatsList:
