@@ -1,11 +1,16 @@
 import os
 from flask import Flask
 import threading
+import logging
 import asyncio
 from Bot import Bot
 
 # Flask app for Render health checks
 app = Flask(__name__)
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @app.route('/')
 @app.route('/health')
@@ -24,10 +29,9 @@ async def main():
 
     # Start Flask in background
     threading.Thread(target=run_flask, daemon=True).start()
-
     await asyncio.sleep(3)
     
-    print('Starting the bot')
+    logger.info('Starting the bot')
     bot = Bot()
 
     print('To stop the bot press Ctrl + C')
@@ -35,11 +39,27 @@ async def main():
 
     try:
 
+         # First calculation
+        logger.info('Running initial calculation...')
         await bot.calculate()
+        logger.info('Initial calculation completed successfully')
+
+        iteration = 0
 
         while True:
+            logger.info(f'Waiting 3600 seconds until next iteration (iteration {iteration})...')
             await asyncio.sleep(3600)
-            await bot.calculate()
+
+            logger.info(f'Running calculation iteration {iteration + 1}...')
+
+            try:
+                await bot.calculate()
+                logger.info(f'Calculation iteration {iteration + 1} completed successfully')
+            
+            except Exception as e:
+                logger.error(f'Error in calculation iteration {iteration + 1}: {e}', exc_info=True)
+           
+            iteration += 1
 
     except KeyboardInterrupt:
         print('\nBot stopped by developer')
