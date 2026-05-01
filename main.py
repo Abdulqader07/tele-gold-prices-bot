@@ -1,48 +1,60 @@
 import os
 from flask import Flask
 import threading
-import logging
+import time
 import asyncio
+import requests
 from Bot import Bot
 
 # Flask app for Render health checks
 app = Flask(__name__)
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+bot = Bot()
 
 @app.route('/')
 @app.route('/health')
 def health():
-    return "Bot running", 200
+    return "Bot running\n", 200
 
-def run_flask():
-    port = int(os.environ.get("PORT", 8080))
+
+@app.route('/run-bot')
+def run_bot():
+    try:
+        asyncio.run(bot.calculate())
+        return 'Bot ran successfully\n'
     
-    print(f"Starting Flask on port {port}")
-    print(f"Health check available at http://0.0.0.0:{port}/health")
+    except Exception as e:
+        return f'Error {e}\n', 500
     
+
+def callBot():
+    time.sleep(10)
+    
+    url = f'http://localhost:{os.environ.get('PORT', 8080)}/run-bot'
+
+    while True:
+        requests.get(url)
+        time.sleep(3600)
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
+    threading.Thread(target=callBot, daemon=True).start()
+
     app.run(host='0.0.0.0', port=port)
 
+'''
 async def main():
 
     # Start Flask in background
     threading.Thread(target=run_flask, daemon=True).start()
     await asyncio.sleep(3)
-    
-    logger.info('Starting the bot')
-    bot = Bot()
 
     print('To stop the bot press Ctrl + C')
     print('Hello I am the bot here to send you alerts about gold prices')
 
     try:
 
-         # First calculation
-        logger.info('Running initial calculation...')
         await bot.calculate()
-        logger.info('Initial calculation completed successfully')
 
         iteration = 0
 
@@ -74,4 +86,4 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        pass
+        pass'''
