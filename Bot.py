@@ -41,7 +41,7 @@ class Bot:
             json.dump(data, wf)
 
 
-    async def calculate(self, thershold = 0.1) -> None:
+    async def calculate(self, thershold = 0.0) -> None:
         await self.price.setPrice()
         
         previous = self.loadPrice()
