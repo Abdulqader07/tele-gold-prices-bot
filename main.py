@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 import threading
 import asyncio
@@ -12,13 +13,20 @@ def health():
     return "Bot running", 200
 
 def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    
+    print(f"Starting Flask on port {port}")
+    
     app.run(host='0.0.0.0', port=8080)
 
 async def main():
 
     # Start Flask in background
     threading.Thread(target=run_flask, daemon=True).start()
+
+    asyncio.sleep(3)
     
+    print('Starting the bot')
     bot = Bot()
 
     print('To stop the bot press Ctrl + C')
