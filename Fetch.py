@@ -3,7 +3,11 @@ from bs4 import BeautifulSoup as bs
 
 class Price:
     def __init__(self) -> None:
-        self.price = '' 
+        self.price = ''
+
+        self.headers = {
+		'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0'
+	    }
 
     async def setPrice(self) -> None:
         self.price = await self.fetchPriceAPI()
@@ -14,13 +18,9 @@ class Price:
     async def fetchPrice(self) -> str:
         url = 'https://www.investing.com/currencies/xau-usd'
 
-        headers = {
-		'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0'
-	    }
-
         async with aiohttp.ClientSession() as session:
             try:
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url, headers=self.headers) as response:
                     html = await response.text()
                     soup = bs(html, 'html.parser')
 
@@ -37,9 +37,9 @@ class Price:
         url = 'https://api.gold-api.com/price/XAU'
 
         async with aiohttp.ClientSession() as session:
-            
+
             try:
-                async with session.get(url) as response:
+                async with session.get(url, headers=self.headers) as response:
                     data = await response.json()
 
                     return f"{data['price']:.2f}"

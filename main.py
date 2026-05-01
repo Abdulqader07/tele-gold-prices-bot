@@ -16,15 +16,16 @@ def run_flask():
     port = int(os.environ.get("PORT", 8080))
     
     print(f"Starting Flask on port {port}")
+    print(f"Health check available at http://0.0.0.0:{port}/health")
     
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=port)
 
 async def main():
 
     # Start Flask in background
     threading.Thread(target=run_flask, daemon=True).start()
 
-    asyncio.sleep(3)
+    await asyncio.sleep(3)
     
     print('Starting the bot')
     bot = Bot()

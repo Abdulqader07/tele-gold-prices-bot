@@ -8,8 +8,8 @@ class Config:
         load_dotenv()
 
         self.BOT_TOKEN = os.getenv('BOT_TOKEN')
-        self.prices_file = '/tmp/prices.json'
-        self.chats_file = '/tmp/chats.json'
+        self.prices_file = 'jsons/prices.json'
+        self.chats_file = 'jsons/chats.json'
         self.dir = 'jsons'
 
         if not self.BOT_TOKEN:
