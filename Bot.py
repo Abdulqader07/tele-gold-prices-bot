@@ -42,6 +42,9 @@ class Bot:
 
 
     async def calculate(self, thershold = 0.0) -> None:
+        import time
+        print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] calculate() was called")
+        
         await self.price.setPrice()
         
         previous = self.loadPrice()

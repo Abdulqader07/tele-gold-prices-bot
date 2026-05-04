@@ -1,9 +1,6 @@
 import os
 from flask import Flask
-import threading
-import time
 import asyncio
-import requests
 from Bot import Bot
 
 # Flask app for Render health checks
