@@ -40,9 +40,9 @@ class Bot:
     async def run(self):
         app = Application.builder().token(self.conf.BOT_TOKEN).build()
         
-        app.add_handler(CommandHandler("start", self.start_command))
-        app.add_handler(CommandHandler("stop", self.stop_command))
-        app.add_handler(CommandHandler("price", self.price_command))
+        app.add_handler(CommandHandler("start", self.startCommand))
+        app.add_handler(CommandHandler("stop", self.stopCommand))
+        app.add_handler(CommandHandler("price", self.priceCommand))
         
         print("Bot is listening for commands...")
         await app.run_polling()
