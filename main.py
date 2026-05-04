@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+import threading
 import asyncio
 from Bot import Bot
 
@@ -22,54 +23,21 @@ def run_bot():
     
     except Exception as e:
         return f'Error {e}\n', 500
+    
+def run_telegram_bot():
+    """Run the telegram bot in a separate event loop"""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(bot.run())
 
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
+    
+    # Start Telegram bot in background thread
+    telegram_thread = threading.Thread(target=run_telegram_bot, daemon=True)
+    telegram_thread.start()
+
+
     app.run(host='0.0.0.0', port=port)
-
-'''
-async def main():
-
-    # Start Flask in background
-    threading.Thread(target=run_flask, daemon=True).start()
-    await asyncio.sleep(3)
-
-    print('To stop the bot press Ctrl + C')
-    print('Hello I am the bot here to send you alerts about gold prices')
-
-    try:
-
-        await bot.calculate()
-
-        iteration = 0
-
-        while True:
-            logger.info(f'Waiting 3600 seconds until next iteration (iteration {iteration})...')
-            await asyncio.sleep(3600)
-
-            logger.info(f'Running calculation iteration {iteration + 1}...')
-
-            try:
-                await bot.calculate()
-                logger.info(f'Calculation iteration {iteration + 1} completed successfully')
-            
-            except Exception as e:
-                logger.error(f'Error in calculation iteration {iteration + 1}: {e}', exc_info=True)
-           
-            iteration += 1
-
-    except KeyboardInterrupt:
-        print('\nBot stopped by developer')
-
-    except asyncio.CancelledError:
-        print('\nBot stopped')
-
-    except Exception as e:
-        print(f'\nError {e}')
-
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        pass'''

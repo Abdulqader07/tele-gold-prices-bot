@@ -4,6 +4,9 @@ import aiohttp
 from datetime import datetime
 from Config import Config
 from Fetch import Price
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
+
 
 class Bot:
     def __init__(self) -> None:
@@ -11,6 +14,39 @@ class Bot:
         self.price = Price()
         self.Data_File = self.conf.prices_file
         self.max_price = 0.0
+
+    async def startCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        chat_id = update.effective_chat.id
+
+        if self.conf.addChat(chat_id):
+            await update.message.reply_text("Hi there, welcome to gold prices alerts")
+
+        else:
+            await update.message.reply_text("You're already subcribed.")
+
+    async def stopCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        chat_id = update.effective_chat.id
+
+        if self.conf.removeChat(chat_id):
+            await update.message.reply_text("You're unsubcribed from this bot.")
+        
+        else:
+            await update.message.reply_text("You're not a subscriber.")
+    
+    async def priceCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        current_price = self.price.getPrice()
+        await update.message.reply_text(f"Current gold price: ${current_price}")
+
+    async def run(self):
+        app = Application.builder().token(self.conf.BOT_TOKEN).build()
+        
+        app.add_handler(CommandHandler("start", self.start_command))
+        app.add_handler(CommandHandler("stop", self.stop_command))
+        app.add_handler(CommandHandler("price", self.price_command))
+        
+        print("Bot is listening for commands...")
+        await app.run_polling()
+
 
     def loadPrice(self):
         if os.path.exists(self.Data_File):
@@ -51,7 +87,7 @@ class Bot:
         current = self.price.getPrice()
 
         if current:
-            print('Gold price: $' + current, end='', flush=True)
+            print('Gold price: $' + current + '\n', end='', flush=True)
         
         if previous is not None and current:
             try:
