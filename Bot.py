@@ -37,17 +37,6 @@ class Bot:
         current_price = self.price.getPrice()
         await update.message.reply_text(f"Current gold price: ${current_price}")
 
-    async def run(self):
-        app = Application.builder().token(self.conf.BOT_TOKEN).build()
-        
-        app.add_handler(CommandHandler("start", self.startCommand))
-        app.add_handler(CommandHandler("stop", self.stopCommand))
-        app.add_handler(CommandHandler("price", self.priceCommand))
-        
-        print("Bot is listening for commands...")
-        await app.run_polling()
-
-
     def loadPrice(self):
         if os.path.exists(self.Data_File):
             try:
@@ -110,17 +99,40 @@ class Bot:
     async def sendTelegramNotifications(self, message):
         url = f'https://api.telegram.org/bot{self.conf.BOT_TOKEN}/sendMessage'
         chat_ids = self.conf.chats_file
-
-        chatsList = self.conf.getChats()
         
         if not chat_ids:
             return 'No subs yet'
         
         async with aiohttp.ClientSession() as session:
-            for id in chatsList:
+            for id in chat_ids:
                 payload = {"chat_id": id, "text": message, "parse_mode": "HTML"}
 
                 try:
                     await session.post(url, json=payload)
                 except Exception as e:
                     print(f'Error {e}')
+
+    async def processCommand(self, chat_id, command):
+        if command == '/start':
+            if self.conf.addChat(chat_id):
+                await self.send_message(chat_id, "Hi there, welcome to gold prices alerts")
+        
+            else:
+                await self.send_message(chat_id, "You're already subscribed.")
+        
+        elif command == '/stop':
+            if self.conf.removeChat(chat_id):
+                await self.send_message(chat_id, "You're unsubscribed from this bot.")
+            else:
+                await self.send_message(chat_id, "You're not a subscriber.")
+        
+        elif command == '/price':
+            current_price = self.price.getPrice()
+            await self.send_message(chat_id, f"Current gold price: ${current_price}")
+
+    async def send_message(self, chat_id, text):
+        url = f'https://api.telegram.org/bot{self.conf.BOT_TOKEN}/sendMessage'
+        payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
+        
+        async with aiohttp.ClientSession() as session:
+            await session.post(url, json=payload)
