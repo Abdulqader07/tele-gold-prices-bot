@@ -25,21 +25,10 @@ def run_bot():
     
     except Exception as e:
         return f'Error {e}\n', 500
-    
 
-def callBot():
-    time.sleep(10)
-    
-    url = f'http://localhost:{os.environ.get('PORT', 8080)}/run-bot'
-
-    while True:
-        requests.get(url)
-        time.sleep(3600)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
-    threading.Thread(target=callBot, daemon=True).start()
-
     app.run(host='0.0.0.0', port=port)
 
 '''
